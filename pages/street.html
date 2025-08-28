@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>街头掠影</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;700&family=Helvetica+Neue:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="../scripts/image-gallery-loader.js"></script>
+    <script src="../scripts/navbar-scroll.js"></script>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="../index.html" class="nav-link">首页</a></li>
+            <li><a href="portfolio.html" class="nav-link">作品集</a></li>
+            <li><a href="journal.html" class="nav-link">札记</a></li>
+        </ul>
+    </nav>
+
+    <!-- 作品展示页面 -->
+    <section class="gallery-page">
+        <div class="container">
+            <div class="gallery-header">
+                <h1 class="gallery-title">街头掠影</h1>
+                <p class="gallery-description">城市街头的生动画面与人文瞬间</p>
+            </div>
+            
+            <div class="photo-grid">
+                <!-- 图片将通过JavaScript动态加载 -->
+                <div class="loading-message">
+                    <p>正在加载图片...</p>
+                </div>
+            </div>
+            
+            <!-- 底部返回按钮 -->
+            <div class="gallery-footer">
+                <a href="portfolio.html" class="back-button-bottom">← 返回作品集</a>
+            </div>
+        </div>
+    </section>
+
+    <script src="../scripts/gallery.js"></script>
+    <script>
+        // 初始化街头掠影画廊
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，开始初始化街头掠影画廊...');
+            
+            // 检查依赖文件是否加载
+            if (typeof ImageGalleryLoader === 'undefined') {
+                console.error('ImageGalleryLoader 类未定义，请检查 image-gallery-loader.js 文件');
+                const loadingMessage = document.querySelector('.loading-message');
+                if (loadingMessage) {
+                    loadingMessage.innerHTML = '<p style="color: red;">错误：图片加载器未找到，请检查文件引用。</p>';
+                }
+                return;
+            }
+            
+            // 检查全局实例是否存在
+            if (!window.imageGalleryLoader) {
+                console.error('imageGalleryLoader 全局实例未找到');
+                const loadingMessage = document.querySelector('.loading-message');
+                if (loadingMessage) {
+                    loadingMessage.innerHTML = '<p style="color: red;">错误：加载器实例未初始化。</p>';
+                }
+                return;
+            }
+            
+            console.log('开始初始化街头掠影画廊...');
+            
+            // 初始化画廊
+            window.imageGalleryLoader.initializeGallery('street').then(() => {
+                console.log('街头掠影画廊初始化成功');
+                // 隐藏加载提示
+                const loadingMessage = document.querySelector('.loading-message');
+                if (loadingMessage) {
+                    loadingMessage.style.display = 'none';
+                }
+            }).catch(error => {
+                console.error('初始化画廊失败:', error);
+                // 显示错误信息
+                const loadingMessage = document.querySelector('.loading-message');
+                if (loadingMessage) {
+                    loadingMessage.innerHTML = `
+                        <div style="color: red; text-align: center;">
+                            <p>加载图片失败</p>
+                            <p>错误信息: ${error.message}</p>
+                            <p>请检查图片文件是否存在，或尝试刷新页面</p>
+                            <button onclick="location.reload()" style="margin-top: 10px; padding: 5px 10px;">刷新页面</button>
+                        </div>
+                    `;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

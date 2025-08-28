@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作品集</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;700&family=Helvetica+Neue:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="../utils/image-utils.js"></script>
+    <script src="../scripts/navbar-scroll.js"></script>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="../index.html" class="nav-link">首页</a></li>
+            <li><a href="portfolio.html" class="nav-link active">作品集</a></li>
+            <li><a href="journal.html" class="nav-link">札记</a></li>
+        </ul>
+    </nav>
+
+    <!-- 作品集页面 -->
+    <section class="portfolio-page">
+        <div class="container">
+            <h1 class="page-title">作品集</h1>
+            <div class="category-grid">
+                <div class="category-item" onclick="openCategory('street')">
+                    <div class="category-image">
+                        <img src="../images/categories/street-cover.webp" alt="街头掠影">
+                    </div>
+                    <div class="category-info">
+                        <h3 class="category-title">街头掠影</h3>
+                        <p class="category-description">城市街头的生动画面与人文瞬间</p>
+                    </div>
+                </div>
+                
+                <div class="category-item" onclick="openCategory('documentary')">
+                    <div class="category-image">
+                        <img src="../images/categories/documentary-cover.webp" alt="人文纪实">
+                    </div>
+                    <div class="category-info">
+                        <h3 class="category-title">人文纪实</h3>
+                        <p class="category-description">记录生活中的真实瞬间与情感</p>
+                    </div>
+                </div>
+                
+                <div class="category-item" onclick="openCategory('nature')">
+                    <div class="category-image">
+                        <img src="../images/categories/nature-cover.webp" alt="自然风光">
+                    </div>
+                    <div class="category-info">
+                        <h3 class="category-title">自然风光</h3>
+                        <p class="category-description">大自然的壮美景色与宁静时刻</p>
+                    </div>
+                </div>
+                
+                <div class="category-item" onclick="openCategory('cityscape')">
+                    <div class="category-image">
+                        <img src="../images/categories/cityscape-cover.webp" alt="城市风光">
+                    </div>
+                    <div class="category-info">
+                        <h3 class="category-title">城市风光</h3>
+                        <p class="category-description">都市建筑的几何美学与光影变幻</p>
+                    </div>
+                </div>
+                
+                <div class="category-item" onclick="openCategory('stilllife')">
+                    <div class="category-image">
+                        <img src="../images/categories/stilllife-cover.webp" alt="静物时光">
+                    </div>
+                    <div class="category-info">
+                        <h3 class="category-title">静物时光</h3>
+                        <p class="category-description">日常物品的诗意表达与美学追求</p>
+                    </div>
+                </div>
+                
+                <div class="category-item" onclick="openCategory('portrait')">
+                    <div class="category-image">
+                        <img src="../images/categories/portrait-cover.webp" alt="人像摄影">
+                    </div>
+                    <div class="category-info">
+                        <h3 class="category-title">人像摄影</h3>
+                        <p class="category-description">人物肖像的情感深度与内心世界</p>
+                    </div>
+                </div>
+                
+                <div class="category-item" onclick="openCategory('animals')">
+                    <div class="category-image">
+                        <img src="../images/categories/animals-cover.webp" alt="动物摄影">
+                    </div>
+                    <div class="category-info">
+                        <h3 class="category-title">动物摄影</h3>
+                        <p class="category-description">捕捉生灵的自然姿态与灵动瞬间</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="../scripts/portfolio.js"></script>
+</body>
+</html>
