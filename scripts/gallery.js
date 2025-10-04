@@ -140,7 +140,7 @@ function displayLightbox(imageUrl, title, description) {
             min-height: 0;
             width: 100%;
         ">
-            <img src="${imageUrl}" alt="${title || '图片'}" style="
+            <img src="${imageUrl}" alt="${title || ''}" style="
                 max-width: 90vw; 
                 max-height: ${availableImageHeight}px; 
                 object-fit: contain; 

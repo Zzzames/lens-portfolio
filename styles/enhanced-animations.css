@@ -1,0 +1,551 @@
+/* 增强动画性能优化CSS */
+
+/* ===================================
+   GPU加速和性能优化基础设置
+   =================================== */
+
+/* 强制GPU加速 */
+.photo-item,
+.category-item,
+.portfolio-item,
+.navbar,
+.pagination-btn,
+.back-button-bottom,
+.lazy-image,
+.photo-overlay,
+.category-image img,
+.portfolio-img {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 使用will-change进行GPU加速预提示 */
+.photo-item:hover,
+.category-item:hover,
+.portfolio-item:hover,
+.photo-overlay,
+.category-image img,
+.portfolio-img {
+    will-change: transform, opacity;
+}
+
+/* ===================================
+   优化的图片悬停动画
+   =================================== */
+
+/* 基础图片项动画 - 使用transform代替位置属性 */
+.photo-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    width: 100%;
+    height: 300px; /* 统一固定高度 */
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0); /* GPU加速 */
+    will-change: transform, box-shadow;
+}
+
+.photo-item:hover {
+    transform: translateY(-8px) translateZ(0);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* 图片缩放动画 - 使用transform3d */
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 确保图片填满容器并保持比例 */
+    object-position: center; /* 图片居中显示 */
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0); /* GPU加速 */
+    will-change: transform;
+}
+
+.photo-item:hover img {
+    transform: scale3d(1.05, 1.05, 1) translateZ(0);
+}
+
+/* 叠加层滑入动画 - 优化性能 */
+.photo-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    padding: 30px 20px 20px;
+    transform: translateY(100%) translateZ(0);
+    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.photo-item:hover .photo-overlay {
+    transform: translateY(0) translateZ(0);
+}
+
+/* ===================================
+   分类和作品集项目动画优化
+   =================================== */
+
+.category-item,
+.portfolio-item {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0);
+    will-change: transform, box-shadow;
+}
+
+.category-item:hover,
+.portfolio-item:hover {
+    transform: translateY(-10px) translateZ(0);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.category-image img,
+.portfolio-img {
+    transform: translateZ(0);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+}
+
+.category-item:hover .category-image img,
+.portfolio-item:hover .portfolio-img {
+    transform: scale3d(1.08, 1.08, 1) translateZ(0);
+}
+
+/* ===================================
+   导航栏动画优化
+   =================================== */
+
+.navbar {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+.navbar.navbar-hidden {
+    transform: translateY(-100%) translateZ(0);
+}
+
+.navbar.navbar-visible {
+    transform: translateY(0) translateZ(0);
+}
+
+/* 导航链接悬停效果 */
+.nav-link {
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--burberry-red);
+    transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 100%;
+}
+
+/* ===================================
+   分页按钮动画优化
+   =================================== */
+
+.pagination-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0);
+    will-change: transform, background-color, color;
+}
+
+.pagination-btn:hover {
+    transform: translateY(-2px) translateZ(0);
+    box-shadow: 0 4px 12px rgba(212, 184, 150, 0.3);
+}
+
+.pagination-btn.active {
+    transform: translateZ(0);
+}
+
+.pagination-btn.active:hover {
+    transform: translateZ(0);
+    box-shadow: 0 4px 12px rgba(182, 16, 44, 0.3);
+}
+
+/* 按钮点击效果 */
+.pagination-btn:active {
+    transform: translateY(0) translateZ(0);
+    transition-duration: 0.1s;
+}
+
+/* ===================================
+   返回按钮动画优化
+   =================================== */
+
+.back-button-bottom {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0);
+    will-change: transform, background-color, color;
+}
+
+.back-button-bottom:hover {
+    transform: translateY(-2px) translateZ(0);
+    box-shadow: 0 6px 20px rgba(182, 16, 44, 0.3);
+}
+
+.back-button-bottom:active {
+    transform: translateY(0) translateZ(0);
+    transition-duration: 0.1s;
+}
+
+/* ===================================
+   加载状态动画优化
+   =================================== */
+
+/* 骨架屏动画 - 优化性能 */
+@keyframes skeleton-loading {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    animation: skeleton-loading 1.5s infinite;
+    transform: translateZ(0);
+    will-change: background-position;
+}
+
+/* 图片淡入动画 - 优化性能 */
+.lazy-image {
+    opacity: 0;
+    transform: translateZ(0);
+    will-change: opacity;
+    transition: opacity 0.3s ease;
+}
+
+.lazy-image.loaded {
+    opacity: 1;
+}
+
+/* ===================================
+   札记预览动画优化
+   =================================== */
+
+.journal-preview-item {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0);
+    will-change: transform, box-shadow;
+}
+
+.journal-preview-item:hover {
+    transform: translateY(-5px) translateZ(0);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.journal-preview-item:hover .journal-image img {
+    transform: scale3d(1.05, 1.05, 1) translateZ(0);
+}
+
+.journal-preview-item:hover .read-more {
+    transform: translateX(5px) translateZ(0);
+}
+
+.journal-image img {
+    transform: translateZ(0);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+}
+
+.read-more {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* ===================================
+   灯箱动画优化
+   =================================== */
+
+.lightbox {
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0);
+    will-change: opacity;
+}
+
+.lightbox.active {
+    opacity: 1;
+}
+
+.lightbox-content {
+    transform: translateZ(0) scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+}
+
+.lightbox.active .lightbox-content {
+    transform: translateZ(0) scale(1);
+}
+
+/* ===================================
+   个人资料图片动画优化
+   =================================== */
+
+.profile-img {
+    transform: translateZ(0);
+    transition: filter 0.3s ease;
+    will-change: filter;
+}
+
+.profile-img:hover {
+    filter: grayscale(0%);
+}
+
+/* ===================================
+   移动端优化
+   =================================== */
+
+@media (max-width: 768px) {
+    /* 移动端图片容器尺寸调整 */
+    .photo-item {
+        height: 250px; /* 移动端稍微减小高度 */
+    }
+    
+    /* 减少移动端动画复杂度 */
+    .photo-item:hover {
+        transform: translateY(-4px) translateZ(0);
+    }
+    
+    .category-item:hover,
+    .portfolio-item:hover {
+        transform: translateY(-5px) translateZ(0);
+    }
+    
+    .photo-item:hover img {
+        transform: scale3d(1.03, 1.03, 1) translateZ(0);
+    }
+    
+    .category-item:hover .category-image img,
+    .portfolio-item:hover .portfolio-img {
+        transform: scale3d(1.05, 1.05, 1) translateZ(0);
+    }
+    
+    /* 触摸设备优化 - 减少悬停效果 */
+    @media (hover: none) {
+        .photo-item:hover,
+        .category-item:hover,
+        .portfolio-item:hover,
+        .journal-preview-item:hover {
+            transform: none;
+        }
+        
+        .photo-item:hover img,
+        .category-item:hover .category-image img,
+        .portfolio-item:hover .portfolio-img,
+        .journal-preview-item:hover .journal-image img {
+            transform: none;
+        }
+        
+        .photo-item:hover .photo-overlay {
+            transform: translateY(100%) translateZ(0);
+        }
+        
+        /* 使用点击事件显示叠加层 */
+        .photo-item:active .photo-overlay {
+            transform: translateY(0) translateZ(0);
+            transition-duration: 0.2s;
+        }
+    }
+    
+    /* 分页按钮移动端优化 */
+    .pagination-btn:hover {
+        transform: none;
+    }
+    
+    .back-button-bottom:hover {
+        transform: none;
+    }
+}
+
+/* 小屏幕设备进一步优化 */
+@media (max-width: 480px) {
+    .photo-item {
+        height: 200px; /* 小屏幕进一步减小高度 */
+    }
+}
+
+/* ===================================
+   性能关键帧动画优化
+   =================================== */
+
+/* 淡入动画 - 使用transform和opacity */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) translateZ(0);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) translateZ(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateZ(0);
+    }
+    to {
+        opacity: 1;
+        transform: translateZ(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px) translateZ(0);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) translateZ(0);
+    }
+}
+
+/* 应用动画类 */
+.fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.fade-in {
+    animation: fadeIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* ===================================
+   减少重绘和重排的优化
+   =================================== */
+
+/* 限制重渲染范围 */
+.photo-grid,
+.category-grid,
+.portfolio-grid {
+    contain: layout style paint;
+}
+
+/* 优化滚动性能 */
+body {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* 减少合成层 */
+.photo-item,
+.category-item,
+.portfolio-item {
+    isolation: isolate;
+}
+
+/* ===================================
+   加载指示器动画优化
+   =================================== */
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%) translateZ(0);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) translateZ(0);
+        opacity: 1;
+    }
+}
+
+.loading-indicator {
+    animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateZ(0);
+    will-change: transform, opacity;
+}
+
+/* ===================================
+   高性能动画类
+   =================================== */
+
+.gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.smooth-transition {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.fast-transition {
+    transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ===================================
+   浏览器兼容性前缀
+   =================================== */
+
+/* Webkit浏览器 */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .photo-item,
+    .category-item,
+    .portfolio-item,
+    .navbar,
+    .pagination-btn,
+    .back-button-bottom,
+    .lazy-image,
+    .photo-overlay {
+        -webkit-transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        -webkit-perspective: 1000;
+    }
+}
+
+/* Firefox */
+@-moz-document url-prefix() {
+    .photo-item,
+    .category-item,
+    .portfolio-item,
+    .navbar,
+    .pagination-btn,
+    .back-button-bottom,
+    .lazy-image,
+    .photo-overlay {
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        perspective: 1000;
+    }
+}

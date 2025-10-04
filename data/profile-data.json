@@ -1,0 +1,22 @@
+{
+  "name": "FG",
+  "bio": [
+    "披星戴月的奔波，",
+    "只为一扇窗。"
+  ],
+  "avatar": "../images/home/Eric.jpg",
+  "background": "../images/home/back.webp",
+  "logos": [
+    {
+      "id": "nikon",
+      "src": "../images/nikon-logo.svg",
+      "name": "Nikon"
+    },
+    {
+      "id": "500px",
+      "src": "../images/500px-logo.svg",
+      "name": "500px"
+    }
+  ],
+  "socialLinks": []
+}

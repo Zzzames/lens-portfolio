@@ -1,5 +1,7 @@
 // 首页专用JavaScript
 document.addEventListener('DOMContentLoaded', function() {
+    document.body.classList.add('loading');
+
     // 添加初始化动画
     setTimeout(() => {
         const heroContent = document.querySelector('.hero-content');
@@ -30,6 +32,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+window.onload = function() {
+    document.body.classList.remove('loading');
+};
 
 // 打开札记页面
 function openJournal(journalId) {

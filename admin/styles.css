@@ -233,6 +233,7 @@ body::-webkit-scrollbar {
 
 .brand-logo:hover {
     opacity: 1;
+    filter: brightness(0) invert(1);
 }
 
 /* 作品集部分 */
@@ -1437,48 +1438,4 @@ html {
     .journal-detail-page {
         padding-top: 90px; /* 移动端导航栏可以隐藏，减少padding */
     }
-}
-
-/* 无限滚动加载指示器样式 */
-.infinite-scroll-indicator {
-    text-align: center;
-    padding: 20px;
-    color: var(--burberry-gray);
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    grid-column: 1 / -1; /* 占据整个网格宽度 */
-}
-
-.loading-spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(212, 184, 150, 0.3);
-    border-top: 2px solid var(--burberry-beige);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.all-images-loaded {
-    text-align: center;
-    padding: 30px;
-    color: var(--burberry-gray);
-    font-size: 16px;
-    opacity: 0.7;
-    grid-column: 1 / -1; /* 占据整个网格宽度 */
-}
-
-.scroll-trigger {
-    height: 1px;
-    width: 100%;
-    margin-top: -1px;
-    visibility: hidden;
-    grid-column: 1 / -1; /* 占据整个网格宽度 */
 }

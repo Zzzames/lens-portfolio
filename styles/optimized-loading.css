@@ -1,0 +1,295 @@
+/* 优化的图片加载样式 */
+
+/* 骨架屏动画 */
+@keyframes skeleton-loading {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.skeleton {
+    background: #f6f7f8;
+    overflow: hidden;
+    position: relative;
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-image {
+    width: 100%;
+    height: 200px;
+    background: #e2e5e7;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.skeleton-text {
+    padding: 0 8px;
+}
+
+.skeleton-line {
+    height: 16px;
+    background: #e2e5e7;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.skeleton-line.short {
+    width: 60%;
+}
+
+/* 懒加载图片状态 */
+.lazy-image {
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+.lazy-image.loading {
+    opacity: 0.5;
+    background: #f0f0f0;
+}
+
+.lazy-image.loaded {
+    opacity: 1;
+}
+
+.lazy-image.error {
+    opacity: 0.3;
+    filter: grayscale(100%);
+}
+
+/* 图片错误状态 */
+.image-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    color: #6c757d;
+    text-align: center;
+}
+
+.error-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+.error-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* 空状态样式 */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    color: #6c757d;
+    grid-column: 1 / -1; /* 占满整个网格 */
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.empty-state h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.5rem;
+    color: #495057;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/* 错误状态样式 */
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    color: #dc3545;
+    grid-column: 1 / -1;
+}
+
+.error-state .error-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+.error-state h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.5rem;
+    color: #dc3545;
+}
+
+.error-state p {
+    margin: 0 0 20px 0;
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+.retry-btn {
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.retry-btn:hover {
+    background: #0056b3;
+}
+
+/* 加载动画优化 */
+.photo-item {
+    transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.photo-item.fade-in {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 分页样式优化 */
+.pagination-container {
+    margin: 40px 0 20px 0;
+    text-align: center;
+}
+
+.pagination {
+    display: inline-flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.pagination-btn {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    background: white;
+    color: #495057;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.pagination-btn:hover {
+    background: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+.pagination-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 10px;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+    .skeleton-image {
+        height: 150px;
+    }
+    
+    .empty-state, .error-state {
+        padding: 40px 15px;
+    }
+    
+    .empty-icon, .error-state .error-icon {
+        font-size: 3rem;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .pagination-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+/* 性能优化：减少重绘 */
+.photo-grid {
+    contain: layout style paint;
+}
+
+.photo-item {
+    contain: layout style paint;
+}
+
+/* 预加载提示 */
+.loading-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 123, 255, 0.9);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    z-index: 1000;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
