@@ -124,34 +124,47 @@ class UnifiedImageLoader {
     }
 
     /**
-     * 初始化 Intersection Observer 用于懒加载（优化版）
+     * 初始化 Intersection Observer 用于懒加载（超激进策略）
      */
     initIntersectionObserver() {
         if ('IntersectionObserver' in window) {
             this.observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const img = entry.target;
-                        // 检查图片是否已经加载过
-                        if (!img.classList.contains('loaded') && !img.classList.contains('loading')) {
-                            this.loadImageWithFallback(img);
-                        }
-                        // 不取消观察，以便在滚动回来时能够保持加载状态
-                        // this.observer.unobserve(img);
+                // 使用requestIdleCallback批量处理
+                const toLoad = entries.filter(e => e.isIntersecting).map(e => e.target);
+                
+                if (toLoad.length > 0) {
+                    if ('requestIdleCallback' in window) {
+                        requestIdleCallback(() => this.batchLoadImages(toLoad), { timeout: 100 });
+                    } else {
+                        this.batchLoadImages(toLoad);
                     }
-                });
+                }
             }, {
-                rootMargin: `${this.LAZY_LOAD_THRESHOLD}px`,
-                // 添加阈值，提高响应性
+                rootMargin: `${this.LAZY_LOAD_THRESHOLD}px`, // 400px
                 threshold: 0.01
             });
         } else {
             this.log('IntersectionObserver 不支持，将使用降级方案');
         }
     }
+    
+    /**
+     * 批量加载图片（高性能）
+     */
+    batchLoadImages(images) {
+        images.forEach(img => {
+            if (!img.classList.contains('loaded') && !img.classList.contains('loading')) {
+                this.loadImageWithFallback(img);
+                // 取消观察以节省性能
+                if (this.observer) {
+                    this.observer.unobserve(img);
+                }
+            }
+        });
+    }
 
     /**
-     * 初始化无限滚动观察器
+     * 初始化无限滚动观察器（超激进策略）
      */
     initInfiniteScrollObserver() {
         if ('IntersectionObserver' in window) {
@@ -159,15 +172,21 @@ class UnifiedImageLoader {
             this.scrollObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting && !this.isLoadingMore && this.hasMoreImages) {
-                        this.log('滚动触发器被激活，开始加载更多图片');
-                        this.loadMoreImages();
+                        this.log('滚动触发器被激活（激进模式）');
+                        // 使用requestIdleCallback避免阻塞滚动
+                        if ('requestIdleCallback' in window) {
+                            requestIdleCallback(() => this.loadMoreImages(), { timeout: 200 });
+                        } else {
+                            setTimeout(() => this.loadMoreImages(), 50);
+                        }
                     }
                 });
             }, {
-                rootMargin: '300px' // 提前300px开始加载，提供更流畅的体验
+                rootMargin: '800px', // 提前800px！非常激进
+                threshold: 0.01
             });
             
-            this.log('无限滚动观察器已初始化');
+            this.log('无限滚动观察器已初始化（激进模式）');
         } else {
             this.log('IntersectionObserver 不支持，将使用滚动事件监听');
             // 降级方案：使用滚动事件
@@ -176,29 +195,35 @@ class UnifiedImageLoader {
     }
 
     /**
-     * 初始化滚动事件监听（降级方案）
+     * 初始化滚动事件监听（降级方案 - 高性能版）
      */
     initScrollEventListener() {
         let throttleTimer = null;
+        let rafId = null;
         
         window.addEventListener('scroll', () => {
-            if (throttleTimer) return;
+            if (rafId) return;
             
-            throttleTimer = setTimeout(() => {
+            rafId = requestAnimationFrame(() => {
                 const scrollPosition = window.innerHeight + window.scrollY;
                 const documentHeight = document.documentElement.offsetHeight;
                 
-                // 当滚动到距离底部500px时触发加载，提供更早的触发点
-                if (scrollPosition >= documentHeight - 500 && !this.isLoadingMore && this.hasMoreImages) {
-                    this.log('滚动事件触发，开始加载更多图片');
-                    this.loadMoreImages();
+                // 提前1000px触发！
+                if (scrollPosition >= documentHeight - 1000 && !this.isLoadingMore && this.hasMoreImages) {
+                    this.log('滚动事件触发（激进模式）');
+                    
+                    if ('requestIdleCallback' in window) {
+                        requestIdleCallback(() => this.loadMoreImages(), { timeout: 200 });
+                    } else {
+                        this.loadMoreImages();
+                    }
                 }
                 
-                throttleTimer = null;
-            }, 100); // 减少节流时间到100ms，提高响应性
-        });
+                rafId = null;
+            });
+        }, { passive: true }); // 使用passive提升滚动性能
         
-        this.log('已使用滚动事件监听作为降级方案');
+        this.log('已使用滚动事件监听作为降级方案（高性能版）');
     }
 
     /**
