@@ -1,6 +1,6 @@
 {
   "version": "3.0",
-  "lastUpdate": "2025-10-04T13:23:01.691Z",
+  "lastUpdate": "2025-10-04T13:59:45.883Z",
   "categories": {
     "street": "街头摄影",
     "documentary": "人文纪实",
@@ -1338,9 +1338,10 @@
         "category": "portrait",
         "number": 14,
         "title": "AI",
-        "description": "Gemini Banana出品。",
+        "description": "Gemini Nano Banana出品。",
         "uploadDate": "2025-10-04T13:22:50.230Z",
-        "exists": true
+        "exists": true,
+        "lastModified": "2025-10-04T13:59:45.883Z"
       }
     ],
     "animals": [
