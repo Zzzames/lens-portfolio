@@ -1,33 +1,54 @@
-// 作品展示页面JavaScript
+// 作品展示页面JavaScript（超高性能版本）
 document.addEventListener('DOMContentLoaded', function () {
     // 优化页面加载动画，减少卡顿
     const photoItems = document.querySelectorAll('.photo-item');
     
     // 批量处理动画，减少累积延迟
-    const BATCH_SIZE = 6; // 每批处琇6个元素
-    const BATCH_DELAY = 50; // 每批间隔减少到50ms
+    const BATCH_SIZE = 12; // 增加批处理大小
+    const BATCH_DELAY = 30; // 进一步减少延迟
     
-    // 先设置所有元素的初始状态
+    // 使用CSS类而不是内联样式（更快）
+    const style = document.createElement('style');
+    style.textContent = `
+        .photo-item-hidden {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .photo-item-visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // 先添加隐藏类
     photoItems.forEach(item => {
-        item.style.opacity = '0';
-        item.style.transform = 'translateY(30px)'; // 减少位移距离
-        item.style.transition = 'all 0.4s ease'; // 减少动画时间
+        item.classList.add('photo-item-hidden');
     });
     
-    // 批量源染动画
-    for (let i = 0; i < photoItems.length; i += BATCH_SIZE) {
-        const batch = Array.from(photoItems).slice(i, i + BATCH_SIZE);
-        const batchIndex = Math.floor(i / BATCH_SIZE);
+    // 使用requestAnimationFrame批量处理
+    const showBatch = (startIndex) => {
+        const endIndex = Math.min(startIndex + BATCH_SIZE, photoItems.length);
         
-        setTimeout(() => {
-            // 使用requestAnimationFrame优化渲染
-            requestAnimationFrame(() => {
-                batch.forEach(item => {
-                    item.style.opacity = '1';
-                    item.style.transform = 'translateY(0)';
-                });
-            });
-        }, batchIndex * BATCH_DELAY);
+        requestAnimationFrame(() => {
+            for (let i = startIndex; i < endIndex; i++) {
+                photoItems[i].classList.remove('photo-item-hidden');
+                photoItems[i].classList.add('photo-item-visible');
+            }
+            
+            // 递归处理下一批
+            if (endIndex < photoItems.length) {
+                setTimeout(() => showBatch(endIndex), BATCH_DELAY);
+            }
+        });
+    };
+    
+    // 使用requestIdleCallback延迟启动动画
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => showBatch(0), { timeout: 100 });
+    } else {
+        setTimeout(() => showBatch(0), 50);
     }
 });
 
