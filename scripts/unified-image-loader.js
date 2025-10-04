@@ -164,7 +164,7 @@ class UnifiedImageLoader {
     }
 
     /**
-     * 初始化无限滚动观察器（超激进策略）
+     * 初始化无限滚动观察器（平衡策略 - 既快又准确）
      */
     initInfiniteScrollObserver() {
         if ('IntersectionObserver' in window) {
@@ -172,7 +172,9 @@ class UnifiedImageLoader {
             this.scrollObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting && !this.isLoadingMore && this.hasMoreImages) {
-                        this.log('滚动触发器被激活（激进模式）');
+                        this.log('滚动触发器被激活（平衡模式）');
+                        this.log(`当前批次: ${this.currentBatch}, 总图片数: ${this.allImages.length}`);
+                        
                         // 使用requestIdleCallback避免阻塞滚动
                         if ('requestIdleCallback' in window) {
                             requestIdleCallback(() => this.loadMoreImages(), { timeout: 200 });
@@ -182,11 +184,11 @@ class UnifiedImageLoader {
                     }
                 });
             }, {
-                rootMargin: '800px', // 提前800px！非常激进
+                rootMargin: '500px', // 平衡：提前500px（既有预加载，又不会太激进）
                 threshold: 0.01
             });
             
-            this.log('无限滚动观察器已初始化（激进模式）');
+            this.log('无限滚动观察器已初始化（平衡模式：500px预加载）');
         } else {
             this.log('IntersectionObserver 不支持，将使用滚动事件监听');
             // 降级方案：使用滚动事件
@@ -195,10 +197,9 @@ class UnifiedImageLoader {
     }
 
     /**
-     * 初始化滚动事件监听（降级方案 - 高性能版）
+     * 初始化滚动事件监听（降级方案 - 平衡版）
      */
     initScrollEventListener() {
-        let throttleTimer = null;
         let rafId = null;
         
         window.addEventListener('scroll', () => {
@@ -208,9 +209,10 @@ class UnifiedImageLoader {
                 const scrollPosition = window.innerHeight + window.scrollY;
                 const documentHeight = document.documentElement.offsetHeight;
                 
-                // 提前1000px触发！
-                if (scrollPosition >= documentHeight - 1000 && !this.isLoadingMore && this.hasMoreImages) {
-                    this.log('滚动事件触发（激进模式）');
+                // 平衡：提前600px触发
+                if (scrollPosition >= documentHeight - 600 && !this.isLoadingMore && this.hasMoreImages) {
+                    this.log('滚动事件触发（平衡模式）');
+                    this.log(`滚动位置: ${scrollPosition}, 文档高度: ${documentHeight}`);
                     
                     if ('requestIdleCallback' in window) {
                         requestIdleCallback(() => this.loadMoreImages(), { timeout: 200 });
@@ -223,7 +225,7 @@ class UnifiedImageLoader {
             });
         }, { passive: true }); // 使用passive提升滚动性能
         
-        this.log('已使用滚动事件监听作为降级方案（高性能版）');
+        this.log('已使用滚动事件监听作为降级方案（平衡版：600px预加载）');
     }
 
     /**
@@ -680,7 +682,10 @@ class UnifiedImageLoader {
      * 加载更多图片
      */
     async loadMoreImages() {
-        if (this.isLoadingMore || !this.hasMoreImages) return;
+        if (this.isLoadingMore || !this.hasMoreImages) {
+            this.log(`跳过加载: isLoadingMore=${this.isLoadingMore}, hasMoreImages=${this.hasMoreImages}`);
+            return;
+        }
         
         this.isLoadingMore = true;
         this.showLoadingIndicator();
@@ -688,11 +693,15 @@ class UnifiedImageLoader {
         const startIndex = this.currentBatch * this.batchSize;
         const endIndex = Math.min(startIndex + this.batchSize, this.allImages.length);
         
+        this.log(`开始加载批次 ${this.currentBatch}: 图片 ${startIndex}-${endIndex} / 总共 ${this.allImages.length}`);
+        
         // 检查是否还有更多图片
         if (startIndex >= this.allImages.length) {
+            this.log('已加载所有图片');
             this.hasMoreImages = false;
             this.hideLoadingIndicator();
             this.isLoadingMore = false;
+            this.showAllImagesLoadedMessage();
             return;
         }
         
@@ -703,13 +712,21 @@ class UnifiedImageLoader {
         await this.renderImageBatch(currentBatchImages, startIndex);
         
         this.currentBatch++;
-        this.isLoadingMore = false;
-        this.hideLoadingIndicator();
         
-        // 如果这是第一批图片，设置无限滚动触发器
-        if (this.currentBatch === 1) {
+        // 检查是否还有下一批
+        const nextStartIndex = this.currentBatch * this.batchSize;
+        if (nextStartIndex >= this.allImages.length) {
+            this.log('这是最后一批图片');
+            this.hasMoreImages = false;
+            this.showAllImagesLoadedMessage();
+        } else {
+            this.log(`还有 ${this.allImages.length - nextStartIndex} 张图片待加载`);
+            // 重新设置触发器
             this.setupScrollTrigger();
         }
+        
+        this.isLoadingMore = false;
+        this.hideLoadingIndicator();
     }
 
     /**
@@ -844,11 +861,41 @@ class UnifiedImageLoader {
     }
 
     /**
-     * 显示所有图片加载完成消息（已禁用）
+     * 显示所有图片加载完成消息（优雅提示）
      */
     showAllImagesLoadedMessage() {
-        // 不显示任何消息，静默结束
-        return;
+        // 移除滚动触发器
+        const trigger = document.querySelector('.scroll-trigger');
+        if (trigger && trigger.parentNode) {
+            trigger.parentNode.removeChild(trigger);
+        }
+        
+        // 显示优雅的完成提示
+        const photoGrid = document.querySelector('.photo-grid');
+        if (photoGrid) {
+            let endMessage = document.querySelector('.gallery-end-message');
+            if (!endMessage) {
+                endMessage = document.createElement('div');
+                endMessage.className = 'gallery-end-message';
+                endMessage.style.cssText = `
+                    text-align: center;
+                    padding: 40px 20px;
+                    color: #999;
+                    font-size: 14px;
+                    opacity: 0;
+                    transition: opacity 0.5s ease;
+                `;
+                endMessage.textContent = `已展示全部 ${this.allImages.length} 张作品`;
+                photoGrid.appendChild(endMessage);
+                
+                // 淡入效果
+                setTimeout(() => {
+                    endMessage.style.opacity = '1';
+                }, 100);
+            }
+        }
+        
+        this.log(`所有图片加载完成！总共 ${this.allImages.length} 张`);
     }
 
     /**
